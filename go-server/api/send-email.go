@@ -8,7 +8,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/onosejoor/email-api/mailer"
 	gomail "gopkg.in/mail.v2"
 )
 
@@ -53,7 +52,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := mailer.SendEmail(req.From, req.To, req.Subject, req.HTML); err != nil {
+	if err := SendEmail(req.From, req.To, req.Subject, req.HTML); err != nil {
 		writeJSON(w, http.StatusInternalServerError, JsonResponse{false, "Failed to send email: " + err.Error()})
 		return
 	}
