@@ -57,19 +57,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Email Sent successfully to " + req.To + "from " + req.From)
 	writeJSON(w, http.StatusOK, JsonResponse{true, "Email sent successfully"})
 }
 
 func initDialer() {
 	dialer = gomail.NewDialer("smtp.gmail.com", 465, os.Getenv("GMAIL_USER"), os.Getenv("GMAIL_APP_PASSWORD"))
-	var err error
-	sender, err = dialer.Dial()
+	_, err := dialer.Dial()
 	if err != nil {
 		log.Fatalf("Failed to dial SMTP: %v", err)
 	}
 }
 
-// SendEmail sends using a persistent SMTP connection
 func SendEmail(from, to, subject, body string) error {
 	once.Do(initDialer)
 
