@@ -57,7 +57,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Email Sent successfully to " + req.To + "from " + req.From)
+	log.Println("Email Sent successfully to " + req.To + " from " + req.From)
 	writeJSON(w, http.StatusOK, JsonResponse{true, "Email sent successfully"})
 }
 
