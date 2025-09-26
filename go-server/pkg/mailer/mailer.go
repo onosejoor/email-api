@@ -34,5 +34,11 @@ func SendEmail(from, to, subject, body string) error {
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
 
-	return gomail.Send(sender, m)
+	err := gomail.Send(sender, m)
+	if err != nil {
+		sender, _ = dialer.Dial()
+		return gomail.Send(sender, m)
+	}
+	return nil
+
 }

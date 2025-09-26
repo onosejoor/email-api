@@ -2,19 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
-	gomail "gopkg.in/mail.v2"
-)
-
-var (
-	dialer *gomail.Dialer
-	sender gomail.SendCloser
-	once   sync.Once
+	mailer "github.com/onosejoor/email-api/pkg/mailer"
+	"golang.org/x/time/rate"
 )
 
 type EmailRequest struct {
@@ -35,9 +29,38 @@ func writeJSON(w http.ResponseWriter, status int, payload JsonResponse) {
 	json.NewEncoder(w).Encode(payload)
 }
 
+var (
+	limiters = make(map[string]*rate.Limiter)
+	mu       sync.Mutex
+)
+
+func getLimiter(key string) *rate.Limiter {
+	mu.Lock()
+	defer mu.Unlock()
+
+	limiter, exists := limiters[key]
+	if !exists {
+		limiter = rate.NewLimiter(1, 5)
+		limiters[key] = limiter
+	}
+	return limiter
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeJSON(w, http.StatusMethodNotAllowed, JsonResponse{false, "Method not allowed"})
+		return
+	}
+
+	key := r.RemoteAddr
+	if !getLimiter(key).Allow() {
+		writeJSON(w, http.StatusTooManyRequests, JsonResponse{false, "Too many requests"})
+		return
+	}
+
+	token := r.Header.Get("X-API-KEY")
+	if token == "" || token != os.Getenv("EMAIL_API_TOKEN") {
+		writeJSON(w, http.StatusUnauthorized, JsonResponse{false, "Unauthorized. Invalid Header Token"})
 		return
 	}
 
@@ -52,32 +75,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendEmail(req.From, req.To, req.Subject, req.HTML); err != nil {
+	if err := mailer.SendEmail(req.From, req.To, req.Subject, req.HTML); err != nil {
 		writeJSON(w, http.StatusInternalServerError, JsonResponse{false, "Failed to send email: " + err.Error()})
 		return
 	}
 
 	log.Println("Email Sent successfully to " + req.To + " from " + req.From)
 	writeJSON(w, http.StatusOK, JsonResponse{true, "Email sent successfully"})
-}
-
-func initDialer() {
-	dialer = gomail.NewDialer("smtp.gmail.com", 465, os.Getenv("GMAIL_USER"), os.Getenv("GMAIL_APP_PASSWORD"))
-	var err error
-	sender, err = dialer.Dial()
-	if err != nil {
-		log.Fatalf("Failed to dial SMTP: %v", err)
-	}
-}
-
-func SendEmail(from, to, subject, body string) error {
-	once.Do(initDialer)
-
-	m := gomail.NewMessage()
-	m.SetHeader("From", fmt.Sprintf("%s <%s>", from, os.Getenv("GMAIL_USER")))
-	m.SetHeader("To", to)
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body)
-
-	return gomail.Send(sender, m)
 }
