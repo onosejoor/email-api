@@ -59,6 +59,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.Header.Get("X-API-KEY")
+	log.Println(token, os.Getenv("EMAIL_API_TOKEN"))
 	if token == "" || token != os.Getenv("EMAIL_API_TOKEN") {
 		writeJSON(w, http.StatusUnauthorized, JsonResponse{false, "Unauthorized. Invalid Header Token"})
 		return
