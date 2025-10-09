@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	mailer "github.com/onosejoor/email-api/pkg/mailer"
+	"github.com/onosejoor/email-api/go-server/pkg/mailer"
 	"golang.org/x/time/rate"
 )
 

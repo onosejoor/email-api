@@ -1,4 +1,4 @@
-module github.com/onosejoor/email-api
+module github.com/onosejoor/email-api/go-server
 
 go 1.25.0
 
