@@ -1,205 +1,141 @@
-**Email API Service: Multi-Language Gateway** 📧
+✉️ **Robust Email API Service**
 
-A robust and scalable Email API service designed to streamline transactional email sending. ✨ This project offers dual implementations in Go and Node.js, demonstrating language-agnostic backend development for efficient and reliable email dispatch. Perfect for integrating email capabilities into any application! 🚀
+This project provides a versatile and efficient API for sending emails, implemented in both Go and Node.js. It offers a standardized interface to facilitate email delivery for various applications, featuring rate limiting and API key authentication for secure and controlled access. The Go implementation showcases two distinct approaches to credential management, demonstrating flexibility in deployment scenarios.
 
----
+## Features
 
-## 📝 Table of Contents
+-   **Go-based Email API**: A high-performance email sending service built with Go, leveraging `gopkg.in/mail.v2` for reliable SMTP communication.
+-   **Node.js Email API**: An alternative implementation using Node.js and `Nodemailer` for easy integration into JavaScript ecosystems.
+-   **Rate Limiting**: Protects against abuse and ensures stable service by limiting the number of requests per client.
+-   **API Key Authentication**: Secures endpoints by requiring a valid `X-API-KEY` header for all email sending requests.
+-   **Flexible Credential Management**: The Go version offers a `go-server` that fetches SMTP credentials from environment variables and a `go-server-without-creds` that accepts them directly in the request payload.
+-   **Modular Mailer Service**: A dedicated `pkg/mailer` module encapsulates email sending logic, promoting reusability and clean architecture.
 
-- [✨ Features](#-features)
-- [🛠️ Technologies Used](#%F0%9F%9B%A0%EF%B8%8F-technologies-used)
-- [🚀 Getting Started](#-getting-started)
-  - [Go Server](#go-server)
-    - [Installation](#installation)
-    - [Environment Variables](#environment-variables)
-    - [Running the Server](#running-the-server)
-  - [Node.js Server](#nodejs-server)
-    - [Installation](#installation-1)
-    - [Environment Variables](#environment-variables-1)
-    - [Running the server](#running-the-server-1)
-- [📄 API Documentation (Go Server)](#-api-documentation-go-server)
-- [📄 API Documentation (Node.js Server)](#-api-documentation-nodejs-server)
-- [💡 Usage Example](#-usage-example)
-- [🤝 Contributing](#-contributing)
-- [👤 Author](#-author)
-- [📜 License](#-license)
-- [🏅 Badges](#-badges)
+## Getting Started
 
----
+To get a copy of this project up and running on your local machine, follow these steps.
 
-## ✨ Features
+### Installation
 
-- **Dual Language Support**: Backend implementations available in both Go and Node.js for flexibility and diverse project needs.
-- **Transactional Email Dispatch**: Reliably sends emails via a configured SMTP service, ideal for notifications, confirmations, and alerts.
-- **RESTful API**: Clean and intuitive endpoints for easy integration into web and mobile applications.
-- **Environment Configuration**: Secure handling of sensitive credentials through environment variables.
-- **Vercel Optimized**: Project structure is suitable for deployment as serverless functions on platforms like Vercel.
+First, clone the repository:
 
----
+```bash
+git clone https://github.com/onosejoor/email-api.git
+cd email-api
+```
 
-## 🛠️ Technologies Used
+There are three distinct server implementations within this repository: `go-server`, `go-server-without-creds`, and `node-server`.
 
-| Technology             | Description                                                               |
-| :--------------------- | :------------------------------------------------------------------------ |
-| **Go**                 | High-performance, concurrent programming language                         |
-| **Node.js**            | JavaScript runtime for server-side applications                           |
-| **Express.js**         | Web framework for Node.js (implicit for Vercel functions)                 |
-| **`gopkg.in/mail.v2`** | Email sending package for Go                                              |
-| **Nodemailer**         | Module for Node.js applications to send emails                            |
-| **`dotenv`**           | Loads environment variables from a `.env` file                            |
-| **Vercel**             | Platform for frontend frameworks and static sites (serverless deployment) |
+#### Go Server (Credential Management via Environment Variables)
 
----
-
-## 🚀 Getting Started
-
-Follow these steps to set up and run the email API services locally.
-
-### Go Server
-
-#### Installation
-
-1.  **Clone the Repository**:
+1.  Navigate to the `go-server` directory:
     ```bash
-    git clone https://github.com/onosejoor/email-api.git
-    cd email-api/go-server
+    cd go-server
     ```
-2.  **Initialize Go Modules**:
+2.  Install Go dependencies:
     ```bash
     go mod tidy
     ```
 
-#### Environment Variables
+#### Go Server (Credential Management via Request Body)
 
-Create a `.env` file in the `go-server` directory with the following variables:
-
-```env
-GMAIL_USER=your_gmail_address@gmail.com
-GMAIL_APP_PASSWORD=your_gmail_app_password
-```
-
-_Note_: For `GMAIL_APP_PASSWORD`, you'll need to generate an App Password from your Google Account settings if you have 2-Step Verification enabled.
-
-#### Running the Server
-
-The Go server files (`api/index.go`, `api/send-email.go`) are designed as HTTP handlers, typically for a serverless environment or to be mounted on a router. For local testing, you would typically have a `main.go` file to run these handlers. Since a `main.go` is not provided in the snippet, we assume these are deployed as Vercel functions. If running locally, you'd integrate them into a custom HTTP server:
-
-```go
-// Example main.go for local testing (not part of the provided code)
-package main
-
-import (
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
-	handler "github.com/onosejoor/email-api/api" // Adjust path based on your module setup
-)
-
-func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	http.HandleFunc("/api", handler.HomeHandler)
-	http.HandleFunc("/api/send-email", handler.Handler) // assuming handler.Handler is the send-email handler
-
-	log.Println("Go server starting on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-```
-
-To run this example `main.go` (if you create it):
-
-```bash
-go run main.go
-```
-
-The server will then be accessible at `http://localhost:8080`.
-
-### Node.js Server
-
-#### Installation
-
-1.  **Clone the Repository**:
+1.  Navigate to the `go-server-without-creds` directory:
     ```bash
-    git clone https://github.com/onosejoor/email-api.git
-    cd email-api/node-server
+    cd go-server-without-creds
     ```
-2.  **Install Dependencies**:
+2.  Install Go dependencies:
+    ```bash
+    go mod tidy
+    ```
+
+#### Node.js Server
+
+1.  Navigate to the `node-server` directory:
+    ```bash
+    cd node-server
+    ```
+2.  Install Node.js dependencies:
     ```bash
     npm install
     ```
 
-#### Environment Variables
+### Environment Variables
 
-Create a `.env` file in the `node-server` directory with the following variables:
+Each server requires specific environment variables to function correctly. Create a `.env` file in the root directory of each respective server (`go-server`, `go-server-without-creds`, `node-server`).
+
+For `go-server` and `node-server`:
 
 ```env
+EMAIL_API_TOKEN=your_strong_api_key_here
 GMAIL_USER=your_gmail_address@gmail.com
 GMAIL_APP_PASSWORD=your_gmail_app_password
 ```
 
-_Note_: As with the Go server, `GMAIL_APP_PASSWORD` requires an App Password from Google Account settings.
+For `go-server-without-creds`:
 
-#### Running the server
+```env
+EMAIL_API_TOKEN=your_strong_api_key_here
+# GMAIL_USER and GMAIL_APP_PASSWORD are provided in the request body for this server
+```
 
-The Node.js server files (`api/index.js`, `api/send-email.js`) are designed as Vercel serverless functions.
-To run the Node.js server locally (which primarily uses `index.js` for `npm run dev`):
+**Note**: A Gmail App Password is required if you have 2-Factor Authentication enabled on your Google account. You can generate one from your Google Account security settings.
+
+## Usage
+
+Each server offers endpoints for sending emails.
+
+### Starting the Servers
+
+#### Go Server (with environment credentials)
+
+Navigate to the `go-server` directory and run:
 
 ```bash
-npm run dev
+go run api/send-email.go # This will typically run on http://localhost:8080 or a similar port
 ```
 
-The server will typically run on `http://localhost:3000` or a similar port.
+#### Go Server (with request body credentials)
 
----
+Navigate to the `go-server-without-creds` directory and run:
 
-## 📄 API Documentation (Go Server)
-
-### Base URL
-
-- **Local Development**: `http://localhost:8080`
-- **Vercel Deployment**: `https://your-go-deployment.vercel.app` (if deployed as Vercel functions)
-
-### Endpoints
-
-#### GET /api
-
-**Overview**: Provides a basic health check and welcome message.
-**Request**:
-No payload required.
-
-**Response**:
-
-```json
-{
-  "success": true,
-  "message": "Hello World!"
-}
+```bash
+go run api/send-email.go # This will typically run on http://localhost:8081 or a similar port
 ```
 
-**Errors**:
+#### Node.js Server
 
-- `405 Method Not Allowed`: If the request method is not GET.
+Navigate to the `node-server` directory and run:
+
+```bash
+npm run dev # For development, using nodemon
+# or
+npm start # For production
+```
+
+By default, the Node.js server will run on `http://localhost:3000` (or Vercel for serverless deployment).
+
+### API Documentation
+
+#### Go Server Endpoints (with environment credentials)
+
+This server primarily focuses on the `/api/send-email` endpoint. The base URL will depend on where your server is hosted (e.g., `http://localhost:8080`).
 
 #### POST /api/send-email
+Sends an email using credentials configured in environment variables.
 
-**Overview**: Dispatches an email using the configured SMTP server.
 **Request**:
-
 ```json
 {
   "to": "recipient@example.com",
-  "subject": "Important Update",
-  "html": "<p>Hello there, this is an <b>HTML formatted</b> email from your Go API!</p>",
-  "from": "Your App Name"
+  "subject": "Hello from Go Server",
+  "html": "<h1>Welcome!</h1><p>This is a test email from the Go server.</p>",
+  "from": "Your Name"
 }
 ```
+**Headers**:
+`X-API-KEY: your_strong_api_key_here`
 
 **Response**:
-
 ```json
 {
   "success": true,
@@ -208,57 +144,34 @@ No payload required.
 ```
 
 **Errors**:
+-   `400 Bad Request`: Missing required fields (`to`, `subject`, `html`, `from`) or invalid JSON body.
+-   `401 Unauthorized`: Invalid or missing `X-API-KEY` header.
+-   `405 Method Not Allowed`: Attempted a method other than POST.
+-   `429 Too Many Requests`: Rate limit exceeded.
+-   `500 Internal Server Error`: Failed to send email due to SMTP issues or internal errors.
 
-- `405 Method Not Allowed`: If the request method is not POST.
-- `400 Bad Request`: If the JSON body is invalid, or missing required fields (`to`, `subject`, `html`, `from`).
-- `500 Internal Server Error`: If there is an issue sending the email (e.g., SMTP failure, invalid credentials, network issues).
+#### Go Server without Credentials Endpoints (with request body credentials)
 
----
-
-## 📄 API Documentation (Node.js Server)
-
-### Base URL
-
-- **Local Development**: `http://localhost:3000`
-- **Vercel Deployment**: `https://your-node-deployment.vercel.app` (if deployed as Vercel functions)
-
-### Endpoints
-
-#### GET /api
-
-**Overview**: Provides a basic health check and welcome message.
-**Request**:
-No payload required.
-
-**Response**:
-
-```json
-{
-  "message": "Hello from Node.js on Vercel!"
-}
-```
-
-**Errors**:
-_(The Node.js `index.js` handler does not explicitly check for HTTP methods, so it will respond to any method with a 200 OK.)_
+This server also primarily focuses on the `/api/send-email` endpoint. The base URL will depend on where your server is hosted (e.g., `http://localhost:8081`).
 
 #### POST /api/send-email
+Sends an email using credentials provided directly in the request body.
 
-**Overview**: Dispatches an email using the configured SMTP server.
 **Request**:
-
 ```json
 {
-  "to": "recipient@example.com",
-  "subject": "Important Update",
-  "text": "Hello there, this is a plain text email from your Node.js API!",
-  "html": "<p>Hello there, this is an <b>HTML formatted</b> email from your Node.js API!</p>"
+  "to": ["recipient1@example.com", "recipient2@example.com"],
+  "subject": "Dynamic Email from Go Server",
+  "html": "<p>This email was sent with credentials in the payload.</p>",
+  "from": "Dynamic Sender",
+  "gmail_user": "dynamic_sender@gmail.com",
+  "gmail_app_password": "dynamic_gmail_app_password"
 }
 ```
-
-**Note**: Either `text` or `html` (or both) can be provided. The `from` field in the request body is ignored; the sender is fixed as `"Zendo" <GMAIL_USER>`.
+**Headers**:
+`X-API-KEY: your_strong_api_key_here`
 
 **Response**:
-
 ```json
 {
   "success": true,
@@ -267,81 +180,68 @@ _(The Node.js `index.js` handler does not explicitly check for HTTP methods, so 
 ```
 
 **Errors**:
+-   `400 Bad Request`: Missing required fields (`to`, `subject`, `html`, `from`, `gmail_user`, `gmail_app_password`) or invalid JSON body.
+-   `401 Unauthorized`: Invalid or missing `X-API-KEY` header.
+-   `405 Method Not Allowed`: Attempted a method other than POST.
+-   `429 Too Many Requests`: Rate limit exceeded.
+-   `500 Internal Server Error`: Failed to send email due to SMTP issues or internal errors.
 
-- `405 Method Not Allowed`: If the request method is not POST.
-- `400 Bad Request`: If missing required fields (`to`, `subject`, and either `text` or `html`).
-- `500 Internal Server Error`: If there is an issue sending the email (e.g., SMTP failure, invalid credentials, network issues).
+#### Node.js Server Endpoints
 
----
+This server primarily focuses on the `/api/send-email` endpoint. The base URL will depend on where your server is hosted (e.g., `http://localhost:3000`).
 
-## 💡 Usage Example
+#### POST /api/send-email
+Sends an email using Nodemailer and credentials configured in environment variables.
 
-Below are cURL examples demonstrating how to interact with the `POST /api/send-email` endpoint for both Go and Node.js servers.
+**Request**:
+```json
+{
+  "to": "recipient@example.com",
+  "subject": "Greetings from Node.js",
+  "html": "<p>Hello, this is an HTML email!</p>",
+  "text": "Hello, this is a plain text email!"
+}
+```
+**Headers**:
+_No `X-API-KEY` required for this Node.js implementation based on the code provided._
 
-### Go Server Example (assuming local server at `http://localhost:8080`)
-
-```bash
-curl -X POST \
-     -H "Content-Type: application/json" \
-     -d '{
-           "to": "test@example.com",
-           "subject": "Hello from Go!",
-           "html": "<p>This is a test email sent from the <b>Go backend</b>.</p>",
-           "from": "My Go App"
-         }' \
-     http://localhost:8080/api/send-email
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Email sent successfully"
+}
 ```
 
-### Node.js Server Example (assuming local server at `http://localhost:3000`)
-
-```bash
-curl -X POST \
-     -H "Content-Type: application/json" \
-     -d '{
-           "to": "test@example.com",
-           "subject": "Hello from Node.js!",
-           "html": "<p>This is a test email sent from the <b>Node.js backend</b>.</p>"
-         }' \
-     http://localhost:3000/api/send-email
-```
+**Errors**:
+-   `400 Bad Request`: Missing required fields (`to`, `subject`, and either `text` or `html`).
+-   `405 Method Not Allowed`: Attempted a method other than POST.
+-   `500 Internal Server Error`: Failed to send email due to Nodemailer configuration or SMTP issues.
 
 ---
 
-## 🤝 Contributing
+## Technologies Used
 
-We welcome contributions to enhance this project! To contribute:
-
-- 🍴 Fork the repository.
-- 🌿 Create a new branch (`git checkout -b feature/your-feature`).
-- 💡 Implement your changes.
-- ✅ Ensure your code passes any existing tests and adheres to coding standards.
-- 💬 Commit your changes with a clear message (`git commit -m 'feat: Add new feature'`).
-- ⬆️ Push to your branch (`git push origin feature/your-feature`).
-- 📝 Open a pull request.
-
----
-
-## 👤 Author
-
-**Onos Ejoot**
-
-- Twitter: [@DevText16]
-- Portfolio: [https://onos-ejoor.vercel.app]
+| Technology    | Description                                       |
+| :------------ | :------------------------------------------------ |
+| **Go**        | High-performance backend language.                |
+| **Node.js**   | JavaScript runtime for server-side applications.  |
+| **Express**   | Fast, unopinionated, minimalist web framework for Node.js. |
+| **Gomail**    | Go package for sending emails.                    |
+| **Nodemailer**| Node.js module for sending emails.                |
+| **Dotenv**    | Loads environment variables from a `.env` file.   |
+| **Go Mod**    | Go's dependency management system.                |
 
 ---
 
-## 📜 License
+## Author
 
-This project does not currently have an explicit license file. Please refer to the repository owner for licensing information.
+**Onos**
+
+-   LinkedIn: [https://linkedin.com/in/yourusername](https://linkedin.com/in/yourusername)
+-   Twitter: [https://twitter.com/yourusername](https://twitter.com/yourusername)
+-   Portfolio: [https://yourportfolio.com](https://yourportfolio.com)
 
 ---
-
-## 🏅 Badges
-
-![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![Nodemailer](https://img.shields.io/badge/Nodemailer-007bff?style=for-the-badge&logo=nodemailer&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
